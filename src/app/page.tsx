@@ -21,6 +21,7 @@ export default function HomePage() {
     status,
     driver,
     eta,
+    otp,
     computedDistance,
     isLoading,
     error,
@@ -110,6 +111,7 @@ export default function HomePage() {
                 driver={driver}
                 eta={eta}
                 status={status}
+                otp={otp}
                 onCall={() => alert(`Calling ${driver.name} (Simulated Demo Call)`)}
                 onChat={() => alert(`Opening chat with ${driver.name} (Simulated Demo Chat)`)}
                 onCancel={cancelRide}
@@ -189,6 +191,7 @@ export default function HomePage() {
             drop={drop}
             status={status}
             distanceKm={computedDistance}
+            eta={eta}
           />
         </div>
       </div>

@@ -9,6 +9,7 @@ interface MapViewProps {
   drop: PuneLocation | null;
   status: string;
   distanceKm: number | null;
+  eta?: string | null;
 }
 
 export function MapView({
@@ -16,6 +17,7 @@ export function MapView({
   drop,
   status,
   distanceKm,
+  eta,
 }: MapViewProps) {
   return (
     <div className="relative w-full h-full min-h-[380px] rounded-3xl overflow-hidden border border-white/80 dark:border-white/10 bg-gradient-to-br from-[#F8F5FC] via-[#F2EEF8] to-[#EBE4F4] dark:from-slate-900 dark:to-slate-950 shadow-[0_20px_50px_rgba(74,28,106,0.08)] flex flex-col items-center justify-center">
@@ -67,7 +69,7 @@ export function MapView({
             {/* Simulated Live Route Progress */}
             <div className="p-3 bg-primary/5 rounded-xl border border-primary/10 text-xs font-semibold text-primary flex items-center justify-center gap-2">
               {status === 'searching' && '🔍 Searching for nearby women captains in Rourkela...'}
-              {status === 'driver_arriving' && '🛵 Captain is en route to your pickup point'}
+              {status === 'driver_arriving' && `🛵 Captain is en route • Reaching in ~${eta || '3 mins'}`}
               {status === 'driver_arrived' && '📍 Captain is waiting at pickup location'}
               {status === 'in_progress' && '🚀 Trip in progress safely towards destination'}
               {status === 'completed' && '🎉 You have safely arrived at your destination!'}

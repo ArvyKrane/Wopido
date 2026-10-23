@@ -17,6 +17,8 @@ export interface BookingState {
   fare: number | null;
   distanceKm: number | null;
   eta: string | null;
+  etaMinutes: number | null;
+  otp: string | null;
   startedAt: Date | null;
 }
 
@@ -31,6 +33,8 @@ export function useBooking() {
     fare: null,
     distanceKm: null,
     eta: null,
+    etaMinutes: null,
+    otp: null,
     startedAt: null,
   });
 
@@ -141,13 +145,17 @@ export function useBooking() {
       await sleep(Math.random() * 2000 + 3000);
 
       const driver = getRandomDriver(category);
-      const eta = category === 'bike' ? '4 min' : category === 'auto' ? '6 min' : '10 min';
+      const etaMins = category === 'bike' ? 3 : category === 'auto' ? 4 : 6;
+      const eta = `${etaMins} mins`;
+      const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
       setState((prev) => ({
         ...prev,
         status: RIDE_STATUS.DRIVER_ARRIVING,
         driver,
         eta,
+        etaMinutes: etaMins,
+        otp,
       }));
 
       // Simulate driver arriving after 20-30 more seconds (shortened for demo)
@@ -275,35 +283,39 @@ export function useBooking() {
 
     // Reset after a moment
     setTimeout(() => {
-      setState({
+      setState((prev) => ({
         rideId: null,
         status: RIDE_STATUS.IDLE,
-        pickup: null,
+        pickup: prev.pickup,
         drop: null,
         category: 'bike',
         driver: null,
         fare: null,
         distanceKm: null,
         eta: null,
+        etaMinutes: null,
+        otp: null,
         startedAt: null,
-      });
+      }));
     }, 3000);
   }, [state.status, state.rideId, supabase]);
 
   const resetBooking = useCallback(() => {
     if (pollingRef.current) clearInterval(pollingRef.current);
-    setState({
+    setState((prev) => ({
       rideId: null,
       status: RIDE_STATUS.IDLE,
-      pickup: null,
+      pickup: prev.pickup,
       drop: null,
       category: 'bike',
       driver: null,
       fare: null,
       distanceKm: null,
       eta: null,
+      etaMinutes: null,
+      otp: null,
       startedAt: null,
-    });
+    }));
   }, []);
 
   useEffect(() => {
