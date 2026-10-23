@@ -38,10 +38,10 @@ export function Navbar({ onMenuToggle }: NavbarProps) {
           </Button>
 
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl wopido-gradient flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <span className="text-white font-black text-lg leading-none">W</span>
+            <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center shadow-sm">
+              <span className="text-slate-950 font-black text-lg leading-none">W</span>
             </div>
-            <span className="font-bold text-xl text-wopido-plum tracking-tight hidden sm:block">
+            <span className="font-bold text-xl text-slate-900 tracking-tight hidden sm:block">
               Wopido
             </span>
           </Link>

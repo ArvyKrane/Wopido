@@ -63,16 +63,16 @@ export function RideOptions({
               className={cn(
                 'w-full flex items-center justify-between p-3.5 rounded-2xl text-left transition-all duration-200 relative overflow-hidden',
                 isSelected
-                  ? 'bg-primary/5 border-2 border-primary shadow-sm scale-[1.01]'
-                  : 'bg-white dark:bg-slate-800 hover:bg-muted/40 border-2 border-border shadow-sm'
+                  ? 'bg-amber-50/50 border-2 border-amber-500 shadow-sm'
+                  : 'bg-white hover:bg-slate-50 border-2 border-slate-200 shadow-2xs'
               )}
             >
               <div className="flex items-center gap-3.5">
                 <div className={cn(
-                  'w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-colors',
+                  'w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-colors',
                   isSelected 
-                    ? 'bg-primary text-white shadow-sm' 
-                    : 'bg-muted text-foreground'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm font-bold' 
+                    : 'bg-slate-100 text-slate-800'
                 )}>
                   {cat.icon}
                 </div>

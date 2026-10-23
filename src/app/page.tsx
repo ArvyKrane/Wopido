@@ -44,8 +44,8 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
-              <span className="text-2xl font-black text-primary tracking-tight">Wopido</span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-primary text-white">
+              <span className="text-2xl font-black text-slate-900 tracking-tight">Wopido</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500 text-slate-950">
                 For Women, By Women
               </span>
             </div>
@@ -129,13 +129,13 @@ export default function HomePage() {
 
           {/* Location Inputs (Always accessible or locked during trip) */}
           {!isBookingActive && (
-            <div className="relative z-30 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
+            <div className="relative z-30 rounded-2xl bg-white border border-slate-200 p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
+                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
                   Where are you heading?
                 </h2>
-                <span className="text-[11px] font-semibold text-muted-foreground/80">Rourkela Region</span>
+                <span className="text-[11px] font-semibold text-slate-500">Rourkela Region</span>
               </div>
 
               <LocationSearch
@@ -146,7 +146,7 @@ export default function HomePage() {
               />
 
               {error && (
-                <div className="p-3 bg-destructive/10 text-destructive text-xs font-semibold rounded-2xl border border-destructive/20">
+                <div className="p-3 bg-red-50 text-red-700 text-xs font-semibold rounded-xl border border-red-200">
                   {error}
                 </div>
               )}
@@ -155,7 +155,7 @@ export default function HomePage() {
 
           {/* Ride Options & Pricing */}
           {!isBookingActive && pickup && drop && (
-            <div className="relative z-10 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
+            <div className="relative z-10 rounded-2xl bg-white border border-slate-200 p-5 shadow-sm space-y-4">
               <RideOptions
                 selectedCategory={category}
                 onSelectCategory={setCategory}
@@ -170,12 +170,12 @@ export default function HomePage() {
                 />
               )}
 
-              {/* Claymorphic 3D Book Button */}
+              {/* Clean Amber Book CTA Button */}
               <button
                 type="button"
                 onClick={bookRide}
                 disabled={isLoading || !pickup || !drop}
-                className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#4A1C6A] via-[#6B2FA0] to-[#E8637A] text-white font-extrabold text-sm tracking-wide shadow-[0_10px_25px_rgba(74,28,106,0.3),inset_0_2px_2px_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_14px_32px_rgba(74,28,106,0.4)] hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+                className="w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm tracking-wide shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
               >
                 <span>Book {selectedCategoryObj.name} with Woman Captain</span>
                 <ArrowRight className="w-4 h-4" />

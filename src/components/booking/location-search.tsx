@@ -38,7 +38,6 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
     setFilteredLocations(filterLocations(query));
   }, [activeField, pickupQuery, dropQuery]);
 
-  // Handle GPS detection
   const handleDetectLiveLocation = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setIsDetectingGps(true);
@@ -67,16 +66,17 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
 
           setIsDetectingGps(false);
           setActiveField(null);
-          // If drop is empty, focus drop next
           if (!drop) {
-            setTimeout(() => dropInputRef.current?.focus(), 150);
+            setTimeout(() => {
+              setActiveField('drop');
+              dropInputRef.current?.focus();
+            }, 150);
           }
         },
         () => {
-          // Fallback to station hub
           onPickupChange({
             id: 'default-hub',
-            name: 'Current Location (Hub)',
+            name: 'Current Location',
             address: `${ROURKELA_LOCATIONS[0].name}, Rourkela`,
             lat: ROURKELA_LOCATIONS[0].lat,
             lng: ROURKELA_LOCATIONS[0].lng,
@@ -95,14 +95,14 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
     setActiveField('pickup');
     setPickupQuery('');
     setFilteredLocations(ROURKELA_LOCATIONS);
-    setTimeout(() => pickupInputRef.current?.focus(), 50);
+    setTimeout(() => pickupInputRef.current?.focus(), 60);
   };
 
   const handleDropFocus = () => {
     setActiveField('drop');
     setDropQuery('');
     setFilteredLocations(ROURKELA_LOCATIONS);
-    setTimeout(() => dropInputRef.current?.focus(), 50);
+    setTimeout(() => dropInputRef.current?.focus(), 60);
   };
 
   const handleSelect = (location: CityLocation) => {
@@ -146,137 +146,153 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
 
   return (
     <div className={cn('relative', activeField ? 'z-50' : 'z-20')}>
-      {/* Dim overlay when selecting */}
+      {/* Backdrop overlay when search is active */}
       {activeField && (
         <div 
-          className="fixed inset-0 z-40 bg-black/15 transition-opacity"
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]"
           onClick={() => setActiveField(null)} 
         />
       )}
 
-      {/* Main Container */}
-      <div className="relative z-50 rounded-2xl bg-white dark:bg-slate-900 border-2 border-border shadow-sm overflow-visible">
-        {/* Pickup Row (Default: Live Current Location) */}
-        <div 
-          onClick={handlePickupFocus}
-          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-t-2xl cursor-pointer hover:bg-muted/40 transition-colors"
-        >
-          <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shrink-0 border border-emerald-200">
-            <Navigation className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+      {/* Main Container - Zero clipping, clean alignment */}
+      <div className="relative z-50 rounded-2xl bg-white border border-slate-200 shadow-sm p-4 space-y-3">
+        {/* Inner Dual Track */}
+        <div className="flex items-stretch gap-3">
+          {/* Left Column: Clean Dot -> Line -> Pin Indicator */}
+          <div className="flex flex-col items-center justify-between py-2 shrink-0 w-5">
+            <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />
+            <div className="w-0.5 flex-1 bg-slate-200 my-1 min-h-[28px]" />
+            <div className="w-3.5 h-3.5 rounded-sm bg-amber-500 ring-4 ring-amber-100" />
           </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Starting Pickup
-              </span>
-              <span className="text-[9px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 px-1.5 py-0.2 rounded-full">
-                Live Location
-              </span>
+          {/* Right Column: Two distinct input rows */}
+          <div className="flex-1 min-w-0 space-y-3">
+            {/* 1. Pickup Input Row */}
+            <div 
+              onClick={handlePickupFocus}
+              className="group cursor-pointer rounded-xl p-2 hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-colors"
+            >
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Pickup Location
+                </span>
+                {pickup && (
+                  <span className="text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 rounded">
+                    Live GPS
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                {pickup && activeField !== 'pickup' ? (
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-slate-900 truncate">{pickup.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{pickup.address}</p>
+                  </div>
+                ) : (
+                  <input
+                    ref={pickupInputRef}
+                    value={pickupQuery}
+                    onChange={(e) => setPickupQuery(e.target.value)}
+                    onFocus={() => setActiveField('pickup')}
+                    placeholder="Search pickup point in Rourkela..."
+                    className="w-full bg-transparent border-0 outline-none text-slate-900 font-semibold text-sm placeholder:text-slate-400 p-0"
+                  />
+                )}
+
+                {pickup && activeField !== 'pickup' ? (
+                  <button
+                    type="button"
+                    onClick={handlePickupFocus}
+                    className="text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-lg shrink-0 transition-colors"
+                  >
+                    Change
+                  </button>
+                ) : pickup && (
+                  <button
+                    type="button"
+                    onClick={clearPickup}
+                    className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 shrink-0"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            {pickup && activeField !== 'pickup' ? (
-              <div className="text-left w-full">
-                <p className="text-sm font-bold text-foreground truncate">{pickup.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{pickup.address}</p>
+            {/* Separator with Swap Button */}
+            <div className="relative flex items-center justify-between border-t border-slate-200 pt-1">
+              <span className="text-[10px] text-slate-400 font-semibold">Where to?</span>
+              <button
+                type="button"
+                onClick={swapLocations}
+                className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-800 border border-slate-200 flex items-center justify-center text-slate-600 transition-colors"
+                title="Swap pickup and destination"
+              >
+                <ArrowUpDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            {/* 2. Destination Drop Row */}
+            <div 
+              onClick={handleDropFocus}
+              className="group cursor-pointer rounded-xl p-2 hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-colors"
+            >
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                  Destination Drop
+                </span>
+                {!drop && (
+                  <span className="text-[9px] font-bold bg-amber-100 text-amber-900 px-1.5 py-0.2 rounded">
+                    Required
+                  </span>
+                )}
               </div>
-            ) : (
-              <input
-                ref={pickupInputRef}
-                value={pickupQuery}
-                onChange={(e) => setPickupQuery(e.target.value)}
-                onFocus={() => setActiveField('pickup')}
-                placeholder="Search pickup point in Rourkela..."
-                className="w-full bg-transparent border-0 outline-none ring-0 text-foreground font-semibold text-sm placeholder:text-muted-foreground/60 p-0 m-0"
-              />
-            )}
-          </div>
 
-          {pickup && activeField !== 'pickup' ? (
-            <span className="text-[11px] font-bold text-primary hover:underline px-2 py-1 rounded-md bg-primary/5 shrink-0">
-              Change
-            </span>
-          ) : pickup && (
-            <button
-              type="button"
-              onClick={clearPickup}
-              className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </div>
+              <div className="flex items-center justify-between gap-2">
+                {drop && activeField !== 'drop' ? (
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-slate-900 truncate">{drop.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{drop.address}</p>
+                  </div>
+                ) : (
+                  <input
+                    ref={dropInputRef}
+                    value={dropQuery}
+                    onChange={(e) => setDropQuery(e.target.value)}
+                    onFocus={() => setActiveField('drop')}
+                    placeholder="Where to? (e.g. NIT Rourkela, RSP Gate, Airport)..."
+                    className="w-full bg-transparent border-0 outline-none text-slate-900 font-semibold text-sm placeholder:text-slate-400 p-0"
+                  />
+                )}
 
-        {/* Divider with Swap Button */}
-        <div className="relative h-px bg-border">
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <button
-              type="button"
-              onClick={swapLocations}
-              className="pointer-events-auto w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-95"
-              title="Swap pickup and destination"
-              aria-label="Swap locations"
-            >
-              <ArrowUpDown className="h-3.5 w-3.5 text-primary" />
-            </button>
-          </div>
-        </div>
-
-        {/* Drop Row (Primary question: "Where to?") */}
-        <div 
-          onClick={handleDropFocus}
-          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-b-2xl cursor-pointer hover:bg-muted/40 transition-colors"
-        >
-          <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center shrink-0 border border-rose-200">
-            <MapPin className="h-4 w-4 text-rose-500" />
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-0.5">
-              Destination Drop
-            </span>
-
-            {drop && activeField !== 'drop' ? (
-              <div className="text-left w-full">
-                <p className="text-sm font-bold text-foreground truncate">{drop.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{drop.address}</p>
+                {drop && (
+                  <button
+                    type="button"
+                    onClick={clearDrop}
+                    className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 shrink-0"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
-            ) : (
-              <input
-                ref={dropInputRef}
-                value={dropQuery}
-                onChange={(e) => setDropQuery(e.target.value)}
-                onFocus={() => setActiveField('drop')}
-                placeholder="Where to? (e.g. NIT Rourkela, RSP Gate)..."
-                className="w-full bg-transparent border-0 outline-none ring-0 text-foreground font-semibold text-sm placeholder:text-muted-foreground/60 p-0 m-0"
-              />
-            )}
+            </div>
           </div>
-
-          {drop && (
-            <button
-              type="button"
-              onClick={clearDrop}
-              className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Quick Suggestion Chips for Fast 1-Tap Destination */}
+      {/* Quick Suggestion Chips for Fast Destination Selection */}
       {!activeField && !drop && (
-        <div className="mt-2.5 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0 mr-1">
-            Quick Drop:
+        <div className="mt-2 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[10px] font-bold text-slate-400 uppercase shrink-0 mr-1">
+            Popular:
           </span>
           {ROURKELA_LOCATIONS.slice(1, 5).map((loc) => (
             <button
               key={loc.id}
               type="button"
               onClick={() => onDropChange(loc)}
-              className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-muted/60 hover:bg-primary/10 hover:text-primary border border-border/80 shrink-0 transition-colors"
+              className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white hover:bg-amber-50 hover:text-amber-800 hover:border-amber-300 border border-slate-200 shrink-0 transition-colors shadow-2xs"
             >
               {loc.name}
             </button>
@@ -284,39 +300,40 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
         </div>
       )}
 
-      {/* Floating Dropdown - Above Everything (z-50) */}
+      {/* Floating Dropdown */}
       {activeField && (
         <div
           ref={dropdownRef}
-          className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-900 rounded-2xl border-2 border-border shadow-xl z-50 overflow-hidden divide-y divide-border/60"
+          className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 overflow-hidden divide-y divide-slate-100"
         >
-          {/* Header with GPS detection option */}
-          <div className="px-4 py-2.5 bg-muted/30 flex items-center justify-between">
-            <p className="text-[11px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-primary" />
-              {activeField === 'pickup' ? 'Select Starting Location' : 'Select Destination in Rourkela'}
+          {/* Header */}
+          <div className="px-4 py-2.5 bg-slate-50 flex items-center justify-between">
+            <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-amber-500" />
+              {activeField === 'pickup' ? 'Choose Pickup Point' : 'Choose Destination in Rourkela'}
             </p>
 
             <button
               type="button"
               onClick={handleDetectLiveLocation}
               disabled={isDetectingGps}
-              className="text-[11px] font-bold text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
+              className="text-[11px] font-bold text-emerald-700 hover:underline flex items-center gap-1"
             >
               <LocateFixed className={cn("w-3.5 h-3.5 text-emerald-600", isDetectingGps && "animate-spin")} />
               <span>{isDetectingGps ? 'Locating...' : 'Use Live GPS'}</span>
             </button>
           </div>
 
+          {/* List */}
           {filteredLocations.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-8 text-center bg-white dark:bg-slate-900">
-              <Search className="h-8 w-8 text-muted-foreground/30" />
-              <p className="text-xs font-semibold text-muted-foreground">
+            <div className="flex flex-col items-center gap-2 py-8 text-center bg-white">
+              <Search className="h-8 w-8 text-slate-300" />
+              <p className="text-xs font-semibold text-slate-500">
                 No locations found matching &ldquo;{activeField === 'pickup' ? pickupQuery : dropQuery}&rdquo;
               </p>
             </div>
           ) : (
-            <div className="max-h-64 overflow-y-auto divide-y divide-border/40 bg-white dark:bg-slate-900">
+            <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 bg-white">
               {filteredLocations.map((location) => {
                 const isSelected = activeField === 'pickup' 
                   ? pickup?.id === location.id 
@@ -328,18 +345,18 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
                     type="button"
                     onClick={() => handleSelect(location)}
                     className={cn(
-                      "w-full flex items-center gap-3.5 px-4 py-3 text-left hover:bg-primary/5 transition-colors group",
-                      isSelected && "bg-primary/5"
+                      "w-full flex items-center gap-3.5 px-4 py-3 text-left hover:bg-slate-50 transition-colors group",
+                      isSelected && "bg-amber-50/50"
                     )}
                   >
-                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      <MapPin className="h-4 w-4 text-primary" />
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                      <MapPin className="h-4 w-4 text-slate-600 group-hover:text-amber-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                      <p className="text-sm font-bold text-slate-900 truncate group-hover:text-amber-600">
                         {location.name}
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">{location.address}</p>
+                      <p className="text-xs text-slate-500 truncate">{location.address}</p>
                     </div>
                     {isSelected && (
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
