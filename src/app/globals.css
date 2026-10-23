@@ -4,48 +4,65 @@
 
 @layer base {
   :root {
-    --background: 250 248 252;
-    --foreground: 26 16 37;
-    --card: 255 255 255;
-    --card-foreground: 26 16 37;
-    --popover: 255 255 255;
-    --popover-foreground: 26 16 37;
-    --primary: 74 28 106;
-    --primary-foreground: 255 255 255;
-    --secondary: 232 99 122;
-    --secondary-foreground: 255 255 255;
-    --muted: 243 240 247;
-    --muted-foreground: 107 47 160;
-    --accent: 244 139 158;
-    --accent-foreground: 255 255 255;
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-    --border: 225 215 235;
-    --input: 225 215 235;
-    --ring: 74 28 106;
-    --radius: 0.75rem;
+    --background: 270 40% 98%;
+    --foreground: 268 45% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 268 45% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 268 45% 12%;
+
+    --primary: 273 58% 28%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 349 74% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 267 25% 94%;
+    --muted-foreground: 268 15% 42%;
+
+    --accent: 349 80% 94%;
+    --accent-foreground: 268 45% 12%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 267 20% 86%;
+    --input: 267 20% 86%;
+    --ring: 273 58% 28%;
+
+    --radius: 0.875rem;
   }
 
   .dark {
-    --background: 26 16 37;
-    --foreground: 250 248 252;
-    --card: 40 24 55;
-    --card-foreground: 250 248 252;
-    --popover: 40 24 55;
-    --popover-foreground: 250 248 252;
-    --primary: 123 63 171;
-    --primary-foreground: 255 255 255;
-    --secondary: 232 99 122;
-    --secondary-foreground: 255 255 255;
-    --muted: 55 35 75;
-    --muted-foreground: 180 150 210;
-    --accent: 244 139 158;
-    --accent-foreground: 26 16 37;
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-    --border: 75 45 100;
-    --input: 75 45 100;
-    --ring: 123 63 171;
+    --background: 268 35% 10%;
+    --foreground: 270 30% 96%;
+
+    --card: 268 30% 15%;
+    --card-foreground: 270 30% 96%;
+
+    --popover: 268 30% 15%;
+    --popover-foreground: 270 30% 96%;
+
+    --primary: 273 65% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 349 74% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 268 25% 20%;
+    --muted-foreground: 268 15% 65%;
+
+    --accent: 349 74% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 268 20% 25%;
+    --input: 268 20% 25%;
+    --ring: 273 65% 55%;
   }
 
   * {
@@ -54,13 +71,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  html {
-    scroll-behavior: smooth;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
@@ -69,107 +80,7 @@
     background: linear-gradient(135deg, #4A1C6A 0%, #7B3FAB 50%, #E8637A 100%);
   }
 
-  .wopido-gradient-soft {
-    background: linear-gradient(135deg, #FAF8FC 0%, #F3F0F7 100%);
-  }
-
   .wopido-card {
-    @apply bg-white rounded-xl border border-wopido-border shadow-sm;
+    @apply bg-card rounded-2xl border border-border shadow-sm;
   }
-
-  .wopido-button-primary {
-    background: linear-gradient(135deg, #4A1C6A 0%, #7B3FAB 100%);
-    @apply text-white font-semibold rounded-xl px-6 py-3 hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg;
-  }
-
-  .wopido-button-secondary {
-    @apply bg-wopido-rose text-white font-semibold rounded-xl px-6 py-3 hover:bg-opacity-90 transition-all duration-200;
-  }
-
-  .sos-button {
-    background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
-    @apply text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95;
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}
-
-/* Custom scrollbar for desktop */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.6);
-}
-
-/* Animations */
-@keyframes wopido-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(74, 28, 106, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 20px rgba(74, 28, 106, 0);
-  }
-}
-
-@keyframes sos-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 25px rgba(220, 38, 38, 0);
-  }
-}
-
-.animate-wopido-pulse {
-  animation: wopido-pulse 2s infinite;
-}
-
-.animate-sos-pulse {
-  animation: sos-pulse 1.5s infinite;
-}
-
-/* Map placeholder styling */
-.map-placeholder {
-  background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f0 50%, #c0dde8 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.map-placeholder::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(74, 28, 106, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(74, 28, 106, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
 }

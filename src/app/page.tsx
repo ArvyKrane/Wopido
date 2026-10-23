@@ -10,7 +10,7 @@ import { BookingStatus } from '@/components/booking/booking-status';
 import { useBooking } from '@/hooks/use-booking';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Sparkles, AlertCircle, ArrowRight, MapPin } from 'lucide-react';
 import { RIDE_CATEGORIES } from '@/lib/demo-data';
 
 export default function HomePage() {
@@ -39,29 +39,29 @@ export default function HomePage() {
   return (
     <div className="space-y-6">
       {/* Brand Hero & Women-first Promise */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 rounded-2xl border border-primary/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-primary/10 via-primary/5 to-rose-500/10 p-5 rounded-2xl border-2 border-primary/20 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl md:text-2xl font-black text-primary tracking-tight">Wopido</h1>
-            <Badge variant="outline" className="border-primary/30 text-primary text-[10px] font-bold">
+            <span className="text-xl md:text-2xl font-black text-primary tracking-tight">Wopido Rides</span>
+            <Badge className="bg-primary text-white text-[11px] font-bold">
               For Women, By Women
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Safe, verified, dedicated women-driver rides across Pune.
+          <p className="text-xs font-medium text-muted-foreground">
+            Dedicated safe transit network connecting women riders with verified women captains across Pune.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 shrink-0">
           {isDemoMode && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-xs font-bold text-amber-900 dark:text-amber-200">
               <AlertCircle className="w-3.5 h-3.5" />
-              Demo Mode Active
+              Demo Mode
             </div>
           )}
-          <div className="hidden md:flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-            <ShieldCheck className="w-4 h-4" />
-            100% Verified Captains
+          <div className="flex items-center gap-1.5 text-xs text-emerald-800 dark:text-emerald-300 font-bold bg-emerald-500/15 px-3 py-1 rounded-full border border-emerald-500/30">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            100% Women Captains
           </div>
         </div>
       </div>
@@ -105,11 +105,14 @@ export default function HomePage() {
 
           {/* Location Inputs (Always accessible or locked during trip) */}
           {!isBookingActive && (
-            <div className="bg-card p-5 rounded-2xl border border-border/70 shadow-sm space-y-4">
-              <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                Where are you heading?
-              </h2>
+            <div className="bg-card p-5 rounded-2xl border-2 border-border shadow-md space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  Where are you heading?
+                </h2>
+                <span className="text-[11px] font-medium text-muted-foreground">Select Pune location</span>
+              </div>
 
               <LocationSearch
                 pickup={pickup}
@@ -119,7 +122,7 @@ export default function HomePage() {
               />
 
               {error && (
-                <div className="p-3 bg-destructive/10 text-destructive text-xs rounded-xl border border-destructive/20">
+                <div className="p-3 bg-destructive/10 text-destructive text-xs font-semibold rounded-xl border border-destructive/20">
                   {error}
                 </div>
               )}
@@ -128,7 +131,7 @@ export default function HomePage() {
 
           {/* Ride Options & Pricing */}
           {!isBookingActive && pickup && drop && (
-            <div className="bg-card p-5 rounded-2xl border border-border/70 shadow-sm space-y-4">
+            <div className="bg-card p-5 rounded-2xl border-2 border-border shadow-md space-y-4">
               <RideOptions
                 selectedCategory={category}
                 onSelectCategory={setCategory}
@@ -146,7 +149,7 @@ export default function HomePage() {
               <Button
                 onClick={bookRide}
                 disabled={isLoading || !pickup || !drop}
-                className="w-full h-12 bg-primary hover:bg-primary/95 text-white font-bold text-sm shadow-md rounded-xl gap-2 transition-transform active:scale-[0.99]"
+                className="w-full h-12 bg-primary hover:bg-primary/95 text-white font-bold text-sm shadow-lg rounded-xl gap-2 transition-transform active:scale-[0.99]"
               >
                 <span>Book {selectedCategoryObj.name} with Woman Captain</span>
                 <ArrowRight className="w-4 h-4" />
