@@ -77,12 +77,6 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
     dropInputRef.current?.focus();
   };
 
-  const handleOutsideClick = (e: React.MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-      setActiveField(null);
-    }
-  };
-
   const swapLocations = (e: React.MouseEvent) => {
     e.stopPropagation();
     const temp = pickup;
@@ -91,13 +85,21 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
   };
 
   return (
-    <div className="relative" onClick={handleOutsideClick}>
-      {/* Claymorphic & Glassmorphic Container */}
-      <div className="relative rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/80 dark:border-white/10 shadow-[0_10px_30px_rgba(74,28,106,0.06),0_1px_3px_rgba(0,0,0,0.05)] overflow-visible">
+    <div className={cn('relative', activeField ? 'z-50' : 'z-20')}>
+      {/* Dim overlay when selecting for focused cognitive experience */}
+      {activeField && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] transition-all"
+          onClick={() => setActiveField(null)} 
+        />
+      )}
+
+      {/* Main Glassmorphic Input Container */}
+      <div className="relative z-50 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-border/80 shadow-[0_8px_25px_rgba(74,28,106,0.06)] overflow-visible">
         {/* Pickup Row */}
         <div 
           onClick={handlePickupFocus}
-          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-t-2xl cursor-pointer hover:bg-primary/[0.02] transition-colors"
+          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-t-2xl cursor-pointer hover:bg-primary/[0.03] transition-colors"
         >
           <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05),0_2px_6px_rgba(16,185,129,0.15)] border border-emerald-200/80">
             <Navigation className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
@@ -135,13 +137,13 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
           )}
         </div>
 
-        {/* Tactile 3D Clay Swap Button */}
+        {/* 3D Tactile Clay Swap Button */}
         <div className="relative h-px bg-gradient-to-r from-transparent via-border to-transparent">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <button
               type="button"
               onClick={swapLocations}
-              className="pointer-events-auto w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-border shadow-[0_4px_10px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] hover:shadow-[0_6px_14px_rgba(74,28,106,0.15)] flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-200 active:scale-90"
+              className="pointer-events-auto w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-border shadow-[0_4px_10px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] hover:shadow-[0_6px_14px_rgba(74,28,106,0.18)] flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-200 active:scale-90"
               title="Swap pickup and destination"
               aria-label="Swap locations"
             >
@@ -153,7 +155,7 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
         {/* Drop Row */}
         <div 
           onClick={handleDropFocus}
-          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-b-2xl cursor-pointer hover:bg-primary/[0.02] transition-colors"
+          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-b-2xl cursor-pointer hover:bg-primary/[0.03] transition-colors"
         >
           <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05),0_2px_6px_rgba(244,63,94,0.15)] border border-rose-200/80">
             <MapPin className="h-4 w-4 text-rose-500 dark:text-rose-400" />
@@ -192,31 +194,31 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
         </div>
       </div>
 
-      {/* Autocomplete Dropdown - Frosted Glass */}
+      {/* Floating Dropdown - Above Everything (z-50) */}
       {activeField && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl border border-white/80 dark:border-white/10 shadow-[0_20px_50px_rgba(74,28,106,0.15)] z-50 overflow-hidden animate-fade-in divide-y divide-border/60"
+          className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-900 rounded-2xl border-2 border-primary/20 shadow-[0_25px_60px_-10px_rgba(74,28,106,0.35)] z-50 overflow-hidden animate-fade-in divide-y divide-border/60"
         >
-          <div className="px-4 py-2.5 bg-gradient-to-r from-primary/5 via-rose-500/5 to-transparent flex items-center justify-between">
+          <div className="px-4 py-2.5 bg-gradient-to-r from-primary/10 via-rose-500/10 to-transparent flex items-center justify-between">
             <p className="text-[11px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-primary" />
               Popular Pune Locations
             </p>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
               Demo Grid
             </span>
           </div>
 
           {filteredLocations.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-8 text-center">
+            <div className="flex flex-col items-center gap-2 py-8 text-center bg-white dark:bg-slate-900">
               <Search className="h-8 w-8 text-muted-foreground/30" />
               <p className="text-xs font-semibold text-muted-foreground">
                 No locations found matching &ldquo;{activeField === 'pickup' ? pickupQuery : dropQuery}&rdquo;
               </p>
             </div>
           ) : (
-            <div className="max-h-64 overflow-y-auto divide-y divide-border/40">
+            <div className="max-h-64 overflow-y-auto divide-y divide-border/40 bg-white dark:bg-slate-900">
               {filteredLocations.map((location) => (
                 <button
                   key={location.id}

@@ -131,7 +131,7 @@ export default function HomePage() {
 
           {/* Location Inputs (Always accessible or locked during trip) */}
           {!isBookingActive && (
-            <div className="rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
+            <div className="relative z-30 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-primary" />
@@ -157,7 +157,7 @@ export default function HomePage() {
 
           {/* Ride Options & Pricing */}
           {!isBookingActive && pickup && drop && (
-            <div className="rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
+            <div className="relative z-10 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
               <RideOptions
                 selectedCategory={category}
                 onSelectCategory={setCategory}
