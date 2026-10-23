@@ -32,7 +32,7 @@ export function BookingStatus({
         <div>
           <h3 className="font-bold text-base text-foreground">Finding your Wopido Captain</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Notifying nearby women drivers in Pune...
+            Notifying nearby women drivers in Rourkela...
           </p>
           {rideId && (
             <p className="text-[11px] font-mono text-muted-foreground mt-2">

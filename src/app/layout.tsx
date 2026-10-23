@@ -6,7 +6,7 @@ import { BottomNav } from '@/components/layout/bottom-nav';
 
 export const metadata: Metadata = {
   title: 'Wopido — Women-First Rides',
-  description: 'Safe, reliable rides by women, for women. Book your ride across Pune with verified women captains.',
+  description: 'Safe, reliable rides by women, for women. Book your ride across Rourkela with verified women captains.',
   icons: {
     icon: '/favicon.ico',
   },

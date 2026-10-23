@@ -95,11 +95,11 @@ export default function SingleRidePage() {
           </div>
           <div className="flex justify-between">
             <span>Duration</span>
-            <span className="font-medium text-foreground">{ride.duration} mins</span>
+            <span className="font-medium text-foreground">{ride.duration || 15} mins</span>
           </div>
           <div className="flex justify-between">
             <span>Payment Method</span>
-            <span className="font-medium text-foreground uppercase">{ride.paymentMethod}</span>
+            <span className="font-medium text-foreground uppercase">{ride.paymentMethod || 'UPI (Direct)'}</span>
           </div>
         </div>
 

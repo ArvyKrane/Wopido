@@ -38,22 +38,18 @@ export default function HomePage() {
 
   return (
     <div className="relative space-y-6">
-      {/* Background Ambient Glowing Orbs (Psychological Warmth & Depth) */}
-      <div className="absolute -top-12 -left-16 w-80 h-80 bg-purple-300/30 rounded-full blur-[100px] pointer-events-none -z-10" />
-      <div className="absolute top-1/2 -right-16 w-96 h-96 bg-rose-200/40 rounded-full blur-[120px] pointer-events-none -z-10" />
-
-      {/* Brand Hero & Women-first Promise - Glass Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_10px_30px_rgba(74,28,106,0.05)]">
+      {/* Brand Hero & Women-first Promise - Clean Card */}
+      <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-border p-5 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
               <span className="text-2xl font-black text-primary tracking-tight">Wopido</span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-primary to-rose-500 text-white shadow-sm">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-primary text-white">
                 For Women, By Women
               </span>
             </div>
             <p className="text-xs font-medium text-muted-foreground max-w-lg">
-              Pune&apos;s premier ride-hailing network driven 100% by verified women captains. Safe, reliable, and respectful travel every time.
+              Rourkela&apos;s premier ride-hailing network driven 100% by verified women captains. Safe, reliable, and respectful travel every time.
             </p>
           </div>
 
@@ -64,7 +60,7 @@ export default function HomePage() {
                 Demo Mode
               </div>
             )}
-            <div className="flex items-center gap-1.5 text-xs text-emerald-800 dark:text-emerald-300 font-bold bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/20 shadow-sm">
+            <div className="flex items-center gap-1.5 text-xs text-emerald-800 dark:text-emerald-300 font-bold bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/20">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               100% Women Captains
             </div>
@@ -137,7 +133,7 @@ export default function HomePage() {
                   <Sparkles className="w-4 h-4 text-primary" />
                   Where are you heading?
                 </h2>
-                <span className="text-[11px] font-semibold text-muted-foreground/80">Pune Region</span>
+                <span className="text-[11px] font-semibold text-muted-foreground/80">Rourkela Region</span>
               </div>
 
               <LocationSearch

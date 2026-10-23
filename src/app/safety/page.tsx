@@ -99,20 +99,20 @@ export default function SafetyPage() {
         </Button>
       </Card>
 
-      {/* Safety Helplines in Pune */}
+      {/* Safety Helplines in Rourkela */}
       <Card className="p-5 border-border/70 bg-card space-y-3">
         <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2">
           <Lock className="w-3.5 h-3.5 text-primary" />
-          Pune Women Safety Helplines
+          Rourkela & Odisha Women Safety Helplines
         </h3>
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="p-2.5 rounded-lg border bg-muted/20">
-            <p className="font-bold text-foreground">Pune Police (Women)</p>
-            <p className="text-primary font-mono font-bold mt-0.5">1091</p>
+            <p className="font-bold text-foreground">Odisha Police (Women)</p>
+            <p className="text-primary font-mono font-bold mt-0.5">1091 / 112</p>
           </div>
           <div className="p-2.5 rounded-lg border bg-muted/20">
             <p className="font-bold text-foreground">National Helpline</p>
-            <p className="text-primary font-mono font-bold mt-0.5">112</p>
+            <p className="text-primary font-mono font-bold mt-0.5">181 / 112</p>
           </div>
         </div>
       </Card>

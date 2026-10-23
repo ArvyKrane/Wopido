@@ -203,7 +203,7 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
           <div className="px-4 py-2.5 bg-gradient-to-r from-primary/10 via-rose-500/10 to-transparent flex items-center justify-between">
             <p className="text-[11px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-primary" />
-              Popular Pune Locations
+              Popular Rourkela Locations
             </p>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
               Demo Grid
