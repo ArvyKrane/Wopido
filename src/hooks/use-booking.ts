@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { RIDE_STATUS, type RideStatus } from '@/lib/constants';
-import { getRandomDriver, type DemoDriver, type PuneLocation } from '@/lib/demo-data';
+import { getRandomDriver, type DemoDriver, type PuneLocation, ROURKELA_LOCATIONS } from '@/lib/demo-data';
 import { calculateFareForCategory } from '@/lib/fare';
 import { calculateDistance, generateId, sleep } from '@/lib/utils';
 
@@ -38,6 +38,55 @@ export function useBooking() {
   const [error, setError] = useState<string | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const supabase = getSupabaseBrowserClient();
+
+  // Automatically fetch live location on load, default starting position
+  useEffect(() => {
+    const defaultRourkelaHub = ROURKELA_LOCATIONS[0];
+    const initialLocation: PuneLocation = {
+      id: 'current-live-loc',
+      name: 'Current Location',
+      address: `${defaultRourkelaHub.name} (Live Hub), Rourkela`,
+      lat: defaultRourkelaHub.lat,
+      lng: defaultRourkelaHub.lng,
+    };
+
+    setState((prev) => {
+      if (prev.pickup) return prev;
+      return { ...prev, pickup: initialLocation };
+    });
+
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          let nearest = ROURKELA_LOCATIONS[0];
+          let minDist = Infinity;
+          for (const loc of ROURKELA_LOCATIONS) {
+            const dist = calculateDistance(latitude, longitude, loc.lat, loc.lng);
+            if (dist < minDist) {
+              minDist = dist;
+              nearest = loc;
+            }
+          }
+
+          setState((prev) => ({
+            ...prev,
+            pickup: {
+              id: 'gps-live-loc',
+              name: 'Current Location (GPS)',
+              address: minDist < 20 ? `Near ${nearest.name}, Rourkela` : `GPS (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
+              lat: latitude,
+              lng: longitude,
+            },
+          }));
+        },
+        () => {
+          // Keep default Rourkela hub if GPS permission dismissed
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
+    }
+  }, []);
 
   const setPickup = useCallback((location: PuneLocation | null) => {
     setState((prev) => ({ ...prev, pickup: location }));

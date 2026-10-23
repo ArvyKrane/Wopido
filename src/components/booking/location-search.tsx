@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { MapPin, Navigation, Search, X, ArrowUpDown } from 'lucide-react';
-import { PUNE_LOCATIONS, type PuneLocation } from '@/lib/demo-data';
-import { cn } from '@/lib/utils';
+import { MapPin, Navigation, Search, X, ArrowUpDown, LocateFixed, Check } from 'lucide-react';
+import { ROURKELA_LOCATIONS, type CityLocation } from '@/lib/demo-data';
+import { cn, calculateDistance } from '@/lib/utils';
 
 interface LocationSearchProps {
-  pickup: PuneLocation | null;
-  drop: PuneLocation | null;
-  onPickupChange: (location: PuneLocation | null) => void;
-  onDropChange: (location: PuneLocation | null) => void;
+  pickup: CityLocation | null;
+  drop: CityLocation | null;
+  onPickupChange: (location: CityLocation | null) => void;
+  onDropChange: (location: CityLocation | null) => void;
 }
 
 type ActiveField = 'pickup' | 'drop' | null;
@@ -18,15 +18,17 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
   const [activeField, setActiveField] = useState<ActiveField>(null);
   const [pickupQuery, setPickupQuery] = useState('');
   const [dropQuery, setDropQuery] = useState('');
-  const [filteredLocations, setFilteredLocations] = useState<PuneLocation[]>([]);
+  const [filteredLocations, setFilteredLocations] = useState<CityLocation[]>(ROURKELA_LOCATIONS);
+  const [isDetectingGps, setIsDetectingGps] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const dropInputRef = useRef<HTMLInputElement>(null);
 
-  const filterLocations = (query: string): PuneLocation[] => {
-    if (!query.trim()) return PUNE_LOCATIONS;
+  const filterLocations = (query: string): CityLocation[] => {
+    if (!query.trim()) return ROURKELA_LOCATIONS;
     const q = query.toLowerCase();
-    return PUNE_LOCATIONS.filter(
+    return ROURKELA_LOCATIONS.filter(
       (l) => l.name.toLowerCase().includes(q) || l.address.toLowerCase().includes(q)
     );
   };
@@ -36,25 +38,83 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
     setFilteredLocations(filterLocations(query));
   }, [activeField, pickupQuery, dropQuery]);
 
+  // Handle GPS detection
+  const handleDetectLiveLocation = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIsDetectingGps(true);
+
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          let nearest = ROURKELA_LOCATIONS[0];
+          let minDist = Infinity;
+          for (const loc of ROURKELA_LOCATIONS) {
+            const dist = calculateDistance(latitude, longitude, loc.lat, loc.lng);
+            if (dist < minDist) {
+              minDist = dist;
+              nearest = loc;
+            }
+          }
+
+          onPickupChange({
+            id: 'gps-live-loc',
+            name: 'Current Location (GPS)',
+            address: minDist < 20 ? `Near ${nearest.name}, Rourkela` : `GPS (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
+            lat: latitude,
+            lng: longitude,
+          });
+
+          setIsDetectingGps(false);
+          setActiveField(null);
+          // If drop is empty, focus drop next
+          if (!drop) {
+            setTimeout(() => dropInputRef.current?.focus(), 150);
+          }
+        },
+        () => {
+          // Fallback to station hub
+          onPickupChange({
+            id: 'default-hub',
+            name: 'Current Location (Hub)',
+            address: `${ROURKELA_LOCATIONS[0].name}, Rourkela`,
+            lat: ROURKELA_LOCATIONS[0].lat,
+            lng: ROURKELA_LOCATIONS[0].lng,
+          });
+          setIsDetectingGps(false);
+          setActiveField(null);
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    } else {
+      setIsDetectingGps(false);
+    }
+  };
+
   const handlePickupFocus = () => {
     setActiveField('pickup');
     setPickupQuery('');
-    setFilteredLocations(PUNE_LOCATIONS);
+    setFilteredLocations(ROURKELA_LOCATIONS);
+    setTimeout(() => pickupInputRef.current?.focus(), 50);
   };
 
   const handleDropFocus = () => {
     setActiveField('drop');
     setDropQuery('');
-    setFilteredLocations(PUNE_LOCATIONS);
+    setFilteredLocations(ROURKELA_LOCATIONS);
+    setTimeout(() => dropInputRef.current?.focus(), 50);
   };
 
-  const handleSelect = (location: PuneLocation) => {
+  const handleSelect = (location: CityLocation) => {
     if (activeField === 'pickup') {
       onPickupChange(location);
       setPickupQuery('');
       setActiveField(null);
       if (!drop) {
-        setTimeout(() => dropInputRef.current?.focus(), 150);
+        setTimeout(() => {
+          setActiveField('drop');
+          dropInputRef.current?.focus();
+        }, 150);
       }
     } else if (activeField === 'drop') {
       onDropChange(location);
@@ -67,14 +127,14 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
     e.stopPropagation();
     onPickupChange(null);
     setPickupQuery('');
-    pickupInputRef.current?.focus();
+    handlePickupFocus();
   };
 
   const clearDrop = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDropChange(null);
     setDropQuery('');
-    dropInputRef.current?.focus();
+    handleDropFocus();
   };
 
   const swapLocations = (e: React.MouseEvent) => {
@@ -86,29 +146,35 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
 
   return (
     <div className={cn('relative', activeField ? 'z-50' : 'z-20')}>
-      {/* Dim overlay when selecting for focused cognitive experience */}
+      {/* Dim overlay when selecting */}
       {activeField && (
         <div 
-          className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] transition-all"
+          className="fixed inset-0 z-40 bg-black/15 transition-opacity"
           onClick={() => setActiveField(null)} 
         />
       )}
 
-      {/* Main Glassmorphic Input Container */}
-      <div className="relative z-50 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-border/80 shadow-[0_8px_25px_rgba(74,28,106,0.06)] overflow-visible">
-        {/* Pickup Row */}
+      {/* Main Container */}
+      <div className="relative z-50 rounded-2xl bg-white dark:bg-slate-900 border-2 border-border shadow-sm overflow-visible">
+        {/* Pickup Row (Default: Live Current Location) */}
         <div 
           onClick={handlePickupFocus}
-          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-t-2xl cursor-pointer hover:bg-primary/[0.03] transition-colors"
+          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-t-2xl cursor-pointer hover:bg-muted/40 transition-colors"
         >
-          <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05),0_2px_6px_rgba(16,185,129,0.15)] border border-emerald-200/80">
+          <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shrink-0 border border-emerald-200">
             <Navigation className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           </div>
 
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest block mb-0.5">
-              Pickup Point
-            </span>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Starting Pickup
+              </span>
+              <span className="text-[9px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 px-1.5 py-0.2 rounded-full">
+                Live Location
+              </span>
+            </div>
+
             {pickup && activeField !== 'pickup' ? (
               <div className="text-left w-full">
                 <p className="text-sm font-bold text-foreground truncate">{pickup.name}</p>
@@ -119,31 +185,35 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
                 ref={pickupInputRef}
                 value={pickupQuery}
                 onChange={(e) => setPickupQuery(e.target.value)}
-                onFocus={handlePickupFocus}
-                placeholder="Search Pune pickup (e.g. Shivajinagar)..."
-                className="w-full bg-transparent border-0 outline-none ring-0 focus:outline-none focus:ring-0 text-foreground font-semibold text-sm placeholder:text-muted-foreground/50 p-0 m-0"
+                onFocus={() => setActiveField('pickup')}
+                placeholder="Search pickup point in Rourkela..."
+                className="w-full bg-transparent border-0 outline-none ring-0 text-foreground font-semibold text-sm placeholder:text-muted-foreground/60 p-0 m-0"
               />
             )}
           </div>
 
-          {pickup && (
+          {pickup && activeField !== 'pickup' ? (
+            <span className="text-[11px] font-bold text-primary hover:underline px-2 py-1 rounded-md bg-primary/5 shrink-0">
+              Change
+            </span>
+          ) : pickup && (
             <button
               type="button"
               onClick={clearPickup}
-              className="w-7 h-7 rounded-full bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+              className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           )}
         </div>
 
-        {/* 3D Tactile Clay Swap Button */}
-        <div className="relative h-px bg-gradient-to-r from-transparent via-border to-transparent">
+        {/* Divider with Swap Button */}
+        <div className="relative h-px bg-border">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <button
               type="button"
               onClick={swapLocations}
-              className="pointer-events-auto w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-border shadow-[0_4px_10px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] hover:shadow-[0_6px_14px_rgba(74,28,106,0.18)] flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-200 active:scale-90"
+              className="pointer-events-auto w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-95"
               title="Swap pickup and destination"
               aria-label="Swap locations"
             >
@@ -152,19 +222,20 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
           </div>
         </div>
 
-        {/* Drop Row */}
+        {/* Drop Row (Primary question: "Where to?") */}
         <div 
           onClick={handleDropFocus}
-          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-b-2xl cursor-pointer hover:bg-primary/[0.03] transition-colors"
+          className="relative flex items-center gap-3.5 px-4 py-3.5 rounded-b-2xl cursor-pointer hover:bg-muted/40 transition-colors"
         >
-          <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05),0_2px_6px_rgba(244,63,94,0.15)] border border-rose-200/80">
-            <MapPin className="h-4 w-4 text-rose-500 dark:text-rose-400" />
+          <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center shrink-0 border border-rose-200">
+            <MapPin className="h-4 w-4 text-rose-500" />
           </div>
 
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest block mb-0.5">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-0.5">
               Destination Drop
             </span>
+
             {drop && activeField !== 'drop' ? (
               <div className="text-left w-full">
                 <p className="text-sm font-bold text-foreground truncate">{drop.name}</p>
@@ -175,9 +246,9 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
                 ref={dropInputRef}
                 value={dropQuery}
                 onChange={(e) => setDropQuery(e.target.value)}
-                onFocus={handleDropFocus}
-                placeholder="Where to? (e.g. Hinjewadi IT Park)..."
-                className="w-full bg-transparent border-0 outline-none ring-0 focus:outline-none focus:ring-0 text-foreground font-semibold text-sm placeholder:text-muted-foreground/50 p-0 m-0"
+                onFocus={() => setActiveField('drop')}
+                placeholder="Where to? (e.g. NIT Rourkela, RSP Gate)..."
+                className="w-full bg-transparent border-0 outline-none ring-0 text-foreground font-semibold text-sm placeholder:text-muted-foreground/60 p-0 m-0"
               />
             )}
           </div>
@@ -186,7 +257,7 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
             <button
               type="button"
               onClick={clearDrop}
-              className="w-7 h-7 rounded-full bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+              className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -194,20 +265,47 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
         </div>
       </div>
 
+      {/* Quick Suggestion Chips for Fast 1-Tap Destination */}
+      {!activeField && !drop && (
+        <div className="mt-2.5 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0 mr-1">
+            Quick Drop:
+          </span>
+          {ROURKELA_LOCATIONS.slice(1, 5).map((loc) => (
+            <button
+              key={loc.id}
+              type="button"
+              onClick={() => onDropChange(loc)}
+              className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-muted/60 hover:bg-primary/10 hover:text-primary border border-border/80 shrink-0 transition-colors"
+            >
+              {loc.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Floating Dropdown - Above Everything (z-50) */}
       {activeField && (
         <div
           ref={dropdownRef}
-          className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-900 rounded-2xl border-2 border-primary/20 shadow-[0_25px_60px_-10px_rgba(74,28,106,0.35)] z-50 overflow-hidden animate-fade-in divide-y divide-border/60"
+          className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-900 rounded-2xl border-2 border-border shadow-xl z-50 overflow-hidden divide-y divide-border/60"
         >
-          <div className="px-4 py-2.5 bg-gradient-to-r from-primary/10 via-rose-500/10 to-transparent flex items-center justify-between">
+          {/* Header with GPS detection option */}
+          <div className="px-4 py-2.5 bg-muted/30 flex items-center justify-between">
             <p className="text-[11px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-primary" />
-              Popular Rourkela Locations
+              {activeField === 'pickup' ? 'Select Starting Location' : 'Select Destination in Rourkela'}
             </p>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
-              Demo Grid
-            </span>
+
+            <button
+              type="button"
+              onClick={handleDetectLiveLocation}
+              disabled={isDetectingGps}
+              className="text-[11px] font-bold text-primary flex items-center gap-1 hover:underline disabled:opacity-50"
+            >
+              <LocateFixed className={cn("w-3.5 h-3.5 text-emerald-600", isDetectingGps && "animate-spin")} />
+              <span>{isDetectingGps ? 'Locating...' : 'Use Live GPS'}</span>
+            </button>
           </div>
 
           {filteredLocations.length === 0 ? (
@@ -219,24 +317,36 @@ export function LocationSearch({ pickup, drop, onPickupChange, onDropChange }: L
             </div>
           ) : (
             <div className="max-h-64 overflow-y-auto divide-y divide-border/40 bg-white dark:bg-slate-900">
-              {filteredLocations.map((location) => (
-                <button
-                  key={location.id}
-                  type="button"
-                  onClick={() => handleSelect(location)}
-                  className="w-full flex items-center gap-3.5 px-4 py-3 text-left hover:bg-primary/5 transition-all group"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center shrink-0 transition-colors">
-                    <MapPin className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
-                      {location.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">{location.address}</p>
-                  </div>
-                </button>
-              ))}
+              {filteredLocations.map((location) => {
+                const isSelected = activeField === 'pickup' 
+                  ? pickup?.id === location.id 
+                  : drop?.id === location.id;
+
+                return (
+                  <button
+                    key={location.id}
+                    type="button"
+                    onClick={() => handleSelect(location)}
+                    className={cn(
+                      "w-full flex items-center gap-3.5 px-4 py-3 text-left hover:bg-primary/5 transition-colors group",
+                      isSelected && "bg-primary/5"
+                    )}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <MapPin className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                        {location.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">{location.address}</p>
+                    </div>
+                    {isSelected && (
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
