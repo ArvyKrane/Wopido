@@ -151,7 +151,7 @@ export function useBooking() {
           fare: fareBreakdown.total,
           distance_km: distance,
           payment_method: 'cash',
-          user_id: 'demo-user-001',
+          rider_id: 'demo-user-001',
         })
         .select()
         .single();

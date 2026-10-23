@@ -10,7 +10,7 @@ import { BookingStatus } from '@/components/booking/booking-status';
 import { useBooking } from '@/hooks/use-booking';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, Sparkles, AlertCircle, ArrowRight, MapPin } from 'lucide-react';
+import { ShieldCheck, Sparkles, AlertCircle, ArrowRight, HeartHandshake, Lock, PhoneCall } from 'lucide-react';
 import { RIDE_CATEGORIES } from '@/lib/demo-data';
 
 export default function HomePage() {
@@ -37,31 +37,57 @@ export default function HomePage() {
   const isBookingActive = status !== 'idle' && status !== 'completed' && status !== 'cancelled';
 
   return (
-    <div className="space-y-6">
-      {/* Brand Hero & Women-first Promise */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-primary/10 via-primary/5 to-rose-500/10 p-5 rounded-2xl border-2 border-primary/20 shadow-sm">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xl md:text-2xl font-black text-primary tracking-tight">Wopido Rides</span>
-            <Badge className="bg-primary text-white text-[11px] font-bold">
-              For Women, By Women
-            </Badge>
+    <div className="relative space-y-6">
+      {/* Background Ambient Glowing Orbs (Psychological Warmth & Depth) */}
+      <div className="absolute -top-12 -left-16 w-80 h-80 bg-purple-300/30 rounded-full blur-[100px] pointer-events-none -z-10" />
+      <div className="absolute top-1/2 -right-16 w-96 h-96 bg-rose-200/40 rounded-full blur-[120px] pointer-events-none -z-10" />
+
+      {/* Brand Hero & Women-first Promise - Glass Card */}
+      <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_10px_30px_rgba(74,28,106,0.05)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl font-black text-primary tracking-tight">Wopido</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-primary to-rose-500 text-white shadow-sm">
+                For Women, By Women
+              </span>
+            </div>
+            <p className="text-xs font-medium text-muted-foreground max-w-lg">
+              Pune&apos;s premier ride-hailing network driven 100% by verified women captains. Safe, reliable, and respectful travel every time.
+            </p>
           </div>
-          <p className="text-xs font-medium text-muted-foreground">
-            Dedicated safe transit network connecting women riders with verified women captains across Pune.
-          </p>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {isDemoMode && (
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-xs font-bold text-amber-800 dark:text-amber-200">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Demo Mode
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 text-xs text-emerald-800 dark:text-emerald-300 font-bold bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/20 shadow-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              100% Women Captains
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
-          {isDemoMode && (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-xs font-bold text-amber-900 dark:text-amber-200">
-              <AlertCircle className="w-3.5 h-3.5" />
-              Demo Mode
-            </div>
-          )}
-          <div className="flex items-center gap-1.5 text-xs text-emerald-800 dark:text-emerald-300 font-bold bg-emerald-500/15 px-3 py-1 rounded-full border border-emerald-500/30">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            100% Women Captains
+        {/* Psychological Trust Banner */}
+        <div className="mt-4 pt-3 border-t border-border/50 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-semibold text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-primary" />
+            <span>Private & Masked Calls</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Police-Verified Drivers</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <HeartHandshake className="w-3.5 h-3.5 text-rose-500" />
+            <span>Zero Male Passengers</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <PhoneCall className="w-3.5 h-3.5 text-primary" />
+            <span>24/7 SOS Response</span>
           </div>
         </div>
       </div>
@@ -105,13 +131,13 @@ export default function HomePage() {
 
           {/* Location Inputs (Always accessible or locked during trip) */}
           {!isBookingActive && (
-            <div className="bg-card p-5 rounded-2xl border-2 border-border shadow-md space-y-4">
+            <div className="rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-primary" />
                   Where are you heading?
                 </h2>
-                <span className="text-[11px] font-medium text-muted-foreground">Select Pune location</span>
+                <span className="text-[11px] font-semibold text-muted-foreground/80">Pune Region</span>
               </div>
 
               <LocationSearch
@@ -122,7 +148,7 @@ export default function HomePage() {
               />
 
               {error && (
-                <div className="p-3 bg-destructive/10 text-destructive text-xs font-semibold rounded-xl border border-destructive/20">
+                <div className="p-3 bg-destructive/10 text-destructive text-xs font-semibold rounded-2xl border border-destructive/20">
                   {error}
                 </div>
               )}
@@ -131,7 +157,7 @@ export default function HomePage() {
 
           {/* Ride Options & Pricing */}
           {!isBookingActive && pickup && drop && (
-            <div className="bg-card p-5 rounded-2xl border-2 border-border shadow-md space-y-4">
+            <div className="rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-white/10 p-5 sm:p-6 shadow-[0_15px_35px_rgba(74,28,106,0.06)] space-y-4">
               <RideOptions
                 selectedCategory={category}
                 onSelectCategory={setCategory}
@@ -146,20 +172,22 @@ export default function HomePage() {
                 />
               )}
 
-              <Button
+              {/* Claymorphic 3D Book Button */}
+              <button
+                type="button"
                 onClick={bookRide}
                 disabled={isLoading || !pickup || !drop}
-                className="w-full h-12 bg-primary hover:bg-primary/95 text-white font-bold text-sm shadow-lg rounded-xl gap-2 transition-transform active:scale-[0.99]"
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#4A1C6A] via-[#6B2FA0] to-[#E8637A] text-white font-extrabold text-sm tracking-wide shadow-[0_10px_25px_rgba(74,28,106,0.3),inset_0_2px_2px_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_14px_32px_rgba(74,28,106,0.4)] hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
               >
                 <span>Book {selectedCategoryObj.name} with Woman Captain</span>
                 <ArrowRight className="w-4 h-4" />
-              </Button>
+              </button>
             </div>
           )}
         </div>
 
         {/* Right Column: Live Map Preview */}
-        <div className="lg:col-span-6 h-[400px] lg:h-[580px] sticky top-20">
+        <div className="lg:col-span-6 h-[420px] lg:h-[600px] sticky top-24">
           <MapView
             pickup={pickup}
             drop={drop}
